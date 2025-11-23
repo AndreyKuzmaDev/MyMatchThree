@@ -10,4 +10,21 @@
 	<color name="gold">#FFFFD700</color>
 	<color name="silver">#FFC0C0C0</color> 
 	<color name="bronze">#FFCD7F32</color>
+
+    <color name="color_primary">#FF6B35</color>
+    <color name="color_primary_dark">#CC552A</color>
+    <color name="color_primary_light">#FF8C5A</color>
+    <color name="color_accent">#4ECDC4</color>
+
+    <color name="background_primary">#2D3047</color>
+    <color name="background_secondary">#3A3E5C</color>
+    <color name="background_card">#424672</color>
+
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3B3B3</color>
+    <color name="text_accent">#4ECDC4</color>
+
+    <color name="button_normal">#FF6B35</color>
+    <color name="button_pressed">#CC552A</color>
+    <color name="button_text">#FFFFFF</color>
 </resources>
