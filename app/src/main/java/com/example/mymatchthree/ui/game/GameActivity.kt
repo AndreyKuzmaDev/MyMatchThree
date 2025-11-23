@@ -106,7 +106,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun onItemClick(item: GameItem) {
-        if (gameEngine.isSwapping) return
+        if (gameEngine.gameState.value?.isSwapping ?: true) return
 
         selectedItem?.let { (firstX, firstY) ->
             if (areNeighbors(firstX, firstY, item.x, item.y)) {
