@@ -62,31 +62,36 @@ class RecordsActivity : AppCompatActivity() {
                 playerName = "Andrey",
                 score = 2025,
                 mode = GameMode.Classic,
-                dateAchieved = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000)
+                dateAchieved = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000),
+                score_str = resources.getString(R.string.word_score)
             ),
             GameRecord(
                 playerName = "Also Andrey",
                 score = 2020,
                 mode = GameMode.Infinite,
-                dateAchieved = System.currentTimeMillis() - (2 * 24 * 60 * 60 * 1000)
+                dateAchieved = System.currentTimeMillis() - (2 * 24 * 60 * 60 * 1000),
+                score_str = resources.getString(R.string.word_score)
             ),
             GameRecord(
                 playerName = "Andrey again",
                 score = 420,
                 mode = GameMode.Classic,
-                dateAchieved = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000)
+                dateAchieved = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000),
+                score_str = resources.getString(R.string.word_score)
             ),
             GameRecord(
                 playerName = "Nobody plays it",
                 score = 220,
                 mode = GameMode.Infinite,
-                dateAchieved = System.currentTimeMillis() - (4 * 24 * 60 * 60 * 1000)
+                dateAchieved = System.currentTimeMillis() - (4 * 24 * 60 * 60 * 1000),
+                score_str = resources.getString(R.string.word_score)
             ),
             GameRecord(
                 playerName = "EvilArthas",
                 score = 141,
                 mode = GameMode.Classic,
-                dateAchieved = System.currentTimeMillis() - (5 * 24 * 60 * 60 * 1000)
+                dateAchieved = System.currentTimeMillis() - (5 * 24 * 60 * 60 * 1000),
+                score_str = resources.getString(R.string.word_score)
             )
         )
 
@@ -140,7 +145,7 @@ class RecordsAdapter : RecyclerView.Adapter<RecordsAdapter.RecordViewHolder>() {
         fun bind(record: GameRecord, position: Int) {
             tvPosition.text = "$position"
             tvPlayerName.text = record.playerName
-            tvScore.text = "${R.string.word_score}: ${record.score}"
+            tvScore.text = "${record.score_str}: ${record.score}"
             tvMode.text = when (record.mode) {
                 GameMode.Classic -> "Classic"
                 GameMode.Infinite -> "Infinite"
