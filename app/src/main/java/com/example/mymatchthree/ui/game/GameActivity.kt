@@ -1,6 +1,5 @@
 package com.example.mymatchthree.ui.game
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -16,6 +15,7 @@ class GameActivity : AppCompatActivity() {
 
     private lateinit var gameEngine: GameEngine
     private var selectedItem: Pair<Int, Int>? = null
+    private var selectedItemView: ItemView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +61,7 @@ class GameActivity : AppCompatActivity() {
 
         val displayMetrics = resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
-        val itemSize = (screenWidth - 32) / grid.size
+        val itemSize = (screenWidth - 64) / grid.size
 
         gridLayout.columnCount = grid.size
         gridLayout.rowCount = grid.size
@@ -69,17 +69,15 @@ class GameActivity : AppCompatActivity() {
         for (i in grid.indices) {
             for (j in grid[i].indices) {
                 val item = grid[i][j]
-                createItemView(item, itemSize, gridLayout)
+                val itemView = createItemView(item, itemSize)
+                gridLayout.addView(itemView)
             }
         }
+
     }
 
-    private fun createItemView(
-        item: GameItem,
-        size: Int,
-        parent: GridLayout
-    ) {
-        val view = View(this).apply {
+    private fun createItemView(item: GameItem, size: Int): View {
+        val itemView = ItemView(this).apply {
             layoutParams = GridLayout.LayoutParams().apply {
                 width = size
                 height = size
@@ -87,36 +85,48 @@ class GameActivity : AppCompatActivity() {
                 rowSpec = GridLayout.spec(item.x)
                 setMargins(2, 2, 2, 2)
             }
-            setBackgroundColor(getColorForType(item.type))
+
+            setTag(R.id.tag_x, item.x)
+            setTag(R.id.tag_y, item.y)
+
+            setItemType(item.type)
+            setSelectedState(false)
+
             setOnClickListener { onItemClick(item) }
         }
-        parent.addView(view)
+        return itemView
     }
 
-    private fun getColorForType(type: Int): Int {
-        return when (type) {
-            1 -> Color.RED
-            2 -> Color.BLUE
-            3 -> Color.GREEN
-            4 -> Color.YELLOW
-            5 -> Color.MAGENTA
-            6 -> Color.CYAN
-            else -> Color.GRAY
+    private fun findViewByPosition(x: Int, y: Int): View? {
+        val gridLayout = findViewById<GridLayout>(R.id.gameGridLayout)
+
+        for (i in 0 until gridLayout.childCount) {
+            val child = gridLayout.getChildAt(i)
+            if (child.getTag(R.id.tag_x) == x && child.getTag(R.id.tag_y) == y) {
+                return child
+            }
         }
+        return null
     }
 
     private fun onItemClick(item: GameItem) {
-        if (gameEngine.gameState.value?.isSwapping ?: true) return
+        if (gameEngine.gameState.value?.isSwapping == true) return
 
-        selectedItem?.let { (firstX, firstY) ->
-            if (areNeighbors(firstX, firstY, item.x, item.y)) {
-                gameEngine.swapItems(firstX, firstY, item.x, item.y)
+        val view = findViewByPosition(item.x, item.y)
+
+        selectedItem?.let { firstItem ->
+            if (areNeighbors(firstItem.first, firstItem.second, item.x, item.y)) {
+                val firstView = findViewByPosition(firstItem.first, firstItem.second)
+                gameEngine.swapItems(firstItem.first, firstItem.second, item.x, item.y)
+
             }
-            selectedItem = null
             clearSelection()
+            selectedItem = null
         } ?: run {
             selectedItem = Pair(item.x, item.y)
-            highlightItem(item)
+            if (view != null) {
+                highlightItem(item, view)
+            }
         }
     }
 
@@ -126,12 +136,30 @@ class GameActivity : AppCompatActivity() {
         return (dx == 1 && dy == 0) || (dx == 0 && dy == 1)
     }
 
-    private fun highlightItem(item: GameItem) {
-        Toast.makeText(this, "Chose item (${item.x}, ${item.y})", Toast.LENGTH_SHORT).show()
+    private fun highlightItem(item: GameItem, view: View) {
+        if (view is ItemView) {
+            selectedItemView?.setSelectedState(false)
+            view.setSelectedState(true)
+            selectedItemView = view
+
+            view.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(200)
+                .start()
+        }
     }
 
     private fun clearSelection() {
-
+        selectedItemView?.let { view ->
+            view.setSelectedState(false)
+            view.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(200)
+                .start()
+            selectedItemView = null
+        }
     }
 
     private fun saveGameState() {
@@ -139,3 +167,4 @@ class GameActivity : AppCompatActivity() {
         prefs.edit().putBoolean("game_saved", true).apply()
     }
 }
+

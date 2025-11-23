@@ -69,7 +69,7 @@ class MainMenuActivity : AppCompatActivity() {
         val configuration = resources.configuration
         configuration.setLocale(locale)
         configuration.setLayoutDirection(locale)
-        
+
         resources.updateConfiguration(configuration, resources.displayMetrics)
         val intent = intent
         finish()
