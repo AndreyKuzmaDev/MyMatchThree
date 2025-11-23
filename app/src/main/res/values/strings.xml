@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">MyMatchThree</string>
+    <string name="app_name" translatable="false">MyMatchThree</string>
+    <string name="word_score">Score</string>
+    <string name="word_moves">Moves</string>
+    <string name="text_back">BACK</string>
+    <string name="app_title" translatable="false">My Match Three</string>
+    <string name="text_new_game">NEW GAME</string>
+    <string name="text_continue">CONTINUE</string>
+    <string name="text_endless_mode">ENDLESS MODE</string>
+    <string name="text_records">RECORDS</string>
+    <string name="text_clear">CLEAR</string>
+    <string name="title_records">Records table</string>
 </resources>

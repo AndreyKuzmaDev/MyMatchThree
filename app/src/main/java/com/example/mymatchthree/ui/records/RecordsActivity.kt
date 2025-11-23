@@ -109,7 +109,6 @@ class RecordsActivity : AppCompatActivity() {
     }
 }
 
-// Адаптер для RecyclerView
 class RecordsAdapter : RecyclerView.Adapter<RecordsAdapter.RecordViewHolder>() {
 
     private var records: List<GameRecord> = emptyList()
@@ -141,7 +140,7 @@ class RecordsAdapter : RecyclerView.Adapter<RecordsAdapter.RecordViewHolder>() {
         fun bind(record: GameRecord, position: Int) {
             tvPosition.text = "$position"
             tvPlayerName.text = record.playerName
-            tvScore.text = "Score: ${record.score}"
+            tvScore.text = "${R.string.word_score}: ${record.score}"
             tvMode.text = when (record.mode) {
                 GameMode.Classic -> "Classic"
                 GameMode.Infinite -> "Infinite"
