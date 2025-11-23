@@ -5,17 +5,18 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import com.example.mymatchthree.R
 import com.example.mymatchthree.data.model.GameMode
 import com.example.mymatchthree.ui.game.GameActivity
 import com.example.mymatchthree.ui.records.RecordsActivity
+import java.util.Locale
 
 class MainMenuActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
-
         setupClickListeners()
     }
 
@@ -40,6 +41,14 @@ class MainMenuActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnRecords).setOnClickListener {
             startActivity(Intent(this, RecordsActivity::class.java))
         }
+
+        findViewById<AppCompatImageButton>(R.id.btnLanguage).setOnClickListener {
+            val language = resources.configuration.locales[0].language
+            if (language.equals("en"))
+                updateLanguage("ru")
+            else if (language.equals("ru"))
+                updateLanguage("en")
+        }
     }
 
     private fun startGame(mode: GameMode, continueGame: Boolean = false) {
@@ -53,5 +62,17 @@ class MainMenuActivity : AppCompatActivity() {
     private fun checkSavedGameExists(): Boolean {
         val prefs = getSharedPreferences("game_prefs", MODE_PRIVATE)
         return prefs.getBoolean("game_saved", false)
+    }
+
+    private fun updateLanguage(language: String, country: String = "") {
+        val locale = Locale(language, country)
+        val configuration = resources.configuration
+        configuration.setLocale(locale)
+        configuration.setLayoutDirection(locale)
+        
+        resources.updateConfiguration(configuration, resources.displayMetrics)
+        val intent = intent
+        finish()
+        startActivity(intent)
     }
 }

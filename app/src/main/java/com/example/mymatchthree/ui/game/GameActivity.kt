@@ -50,8 +50,8 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun updateUI(state: GameState) {
-        findViewById<TextView>(R.id.tvScore).text = "Score: ${state.score}"
-        findViewById<TextView>(R.id.tvMoves).text = "Moves: ${state.moves}"
+        findViewById<TextView>(R.id.tvScore).text = "${resources.getString(R.string.word_score)}: ${state.score}"
+        findViewById<TextView>(R.id.tvMoves).text = "${resources.getString(R.string.word_moves)}: ${state.moves}"
         updateGrid(state.grid)
     }
 
