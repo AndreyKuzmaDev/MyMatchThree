@@ -1,10 +1,7 @@
 package com.example.mymatchthree.data.model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-
 data class GameState(
-    val grid: List<List<GameItem>> = emptyList(),
+    val grid: List<List<GameItem>>,
     val score: Int = 0,
     val moves: Int = 0,
     val isSwapping: Boolean = false,

@@ -7,16 +7,18 @@ import com.example.mymatchthree.data.model.GameState
 import com.example.mymatchthree.data.model.ItemBonus
 
 
-class GameEngine(private val gridSize: Int = 8) {
-
+class GameEngine(private val savedState: GameState? = null ,private val gridSize: Int = 8) {
     val gameState = MutableLiveData<GameState>()
     var newId = 0
 
     init {
-        initializeGrid()
+        gameState.value = initializeGrid()
     }
 
-    fun initializeGrid() {
+    fun initializeGrid(): GameState {
+        if (savedState != null)
+            return savedState
+
         val newGrid = mutableListOf<List<GameItem>>()
         for (i in 0 until gridSize) {
             val row = mutableListOf<GameItem>()
@@ -25,7 +27,11 @@ class GameEngine(private val gridSize: Int = 8) {
             }
             newGrid.add(row)
         }
-        gameState.value = GameState(grid = newGrid)
+        return GameState(grid = newGrid)
+    }
+
+    fun getCurrentState(): GameState {
+        return gameState.value ?: initializeGrid()
     }
 
     private fun createRandomItem(x: Int, y: Int): GameItem {

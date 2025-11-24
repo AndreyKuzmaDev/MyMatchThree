@@ -9,6 +9,7 @@ import com.example.mymatchthree.data.model.GameItem
 import com.example.mymatchthree.data.model.GameMode
 import com.example.mymatchthree.data.model.GameState
 import com.example.mymatchthree.gameengine.GameEngine
+import com.example.mymatchthree.gameengine.GameSaveManager
 import kotlin.math.abs
 
 class GameActivity : AppCompatActivity() {
@@ -17,21 +18,35 @@ class GameActivity : AppCompatActivity() {
     private var selectedItem: Pair<Int, Int>? = null
     private var selectedItemView: ItemView? = null
 
+    private var gameSaveManager: GameSaveManager = GameSaveManager(this)
+    private var gameMode: GameMode? = null
+    private var loadSaved: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        val gameMode = intent.getStringExtra("GAME_MODE")?.let {
+        gameMode = intent.getStringExtra("GAME_MODE")?.let {
             GameMode.valueOf(it)
         } ?: GameMode.Classic
+        loadSaved = intent.getBooleanExtra("CONTINUE_GAME", false)
 
-        initializeGame(gameMode)
+        initializeGame()
         setupGridView()
         setupClickListeners()
     }
 
-    private fun initializeGame(mode: GameMode) {
-        gameEngine = GameEngine()
+    private fun initializeGame() {
+        if (loadSaved && gameSaveManager.hasSavedGame()) {
+            gameEngine = GameEngine(savedState = gameSaveManager.convertFromSaveFormat(
+                gameSaveManager.loadGame()!!
+            ))
+        }
+        else {
+            gameSaveManager.deleteSave()
+            gameEngine = GameEngine()
+        }
+
 
         gameEngine.gameState.observe(this) { state ->
             updateUI(state)
@@ -118,6 +133,7 @@ class GameActivity : AppCompatActivity() {
             if (areNeighbors(firstItem.first, firstItem.second, item.x, item.y)) {
                 val firstView = findViewByPosition(firstItem.first, firstItem.second)
                 gameEngine.swapItems(firstItem.first, firstItem.second, item.x, item.y)
+                gameSaveManager.saveGame(gameEngine.getCurrentState(), gameMode)
 
             }
             clearSelection()

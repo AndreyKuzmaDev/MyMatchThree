@@ -11,4 +11,5 @@
     <string name="text_records">RECORDS</string>
     <string name="text_clear">CLEAR</string>
     <string name="title_records">Records table</string>
+    <string name="text_no_saves">No saves!</string>
 </resources>

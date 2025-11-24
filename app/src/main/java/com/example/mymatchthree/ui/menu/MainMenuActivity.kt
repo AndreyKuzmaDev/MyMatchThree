@@ -3,11 +3,13 @@ package com.example.mymatchthree.ui.menu
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import com.example.mymatchthree.R
 import com.example.mymatchthree.data.model.GameMode
+import com.example.mymatchthree.gameengine.GameSaveManager
 import com.example.mymatchthree.ui.game.GameActivity
 import com.example.mymatchthree.ui.records.RecordsActivity
 import java.util.Locale
@@ -17,9 +19,20 @@ class MainMenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
+        setFlag()
+
         setupClickListeners()
     }
 
+    private fun setFlag() {
+        val language = resources.configuration.locales[0].language
+        val button = findViewById<ImageButton>(R.id.btnLanguage)
+        if (language == "ru")
+            button.setImageResource(R.drawable.ru)
+        else
+            button.setImageResource(R.drawable.us)
+
+    }
     private fun setupClickListeners() {
         findViewById<Button>(R.id.btnNewGame).setOnClickListener {
             startGame(GameMode.Classic)
@@ -30,7 +43,7 @@ class MainMenuActivity : AppCompatActivity() {
             if (savedGameExists) {
                 startGame(GameMode.Classic, continueGame = true)
             } else {
-                Toast.makeText(this, "No saves", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, resources.getString(R.string.text_no_saves), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -60,8 +73,8 @@ class MainMenuActivity : AppCompatActivity() {
     }
 
     private fun checkSavedGameExists(): Boolean {
-        val prefs = getSharedPreferences("game_prefs", MODE_PRIVATE)
-        return prefs.getBoolean("game_saved", false)
+        val gameSaveManager = GameSaveManager(this)
+        return gameSaveManager.hasSavedGame()
     }
 
     private fun updateLanguage(language: String, country: String = "") {

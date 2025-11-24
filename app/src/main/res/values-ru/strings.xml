@@ -9,4 +9,5 @@
     <string name="text_records">РЕКОРДЫ</string>
     <string name="text_clear">ОЧИСТИТЬ</string>
     <string name="title_records">Таблица рекордов</string>
+    <string name="text_no_saves">Нет сохранений!</string>
 </resources>
