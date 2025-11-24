@@ -3,6 +3,7 @@ package com.example.mymatchthree.ui.menu
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +20,9 @@ class MainMenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
+
         setFlag()
+        setPlayerName()
 
         setupClickListeners()
     }
@@ -33,6 +36,13 @@ class MainMenuActivity : AppCompatActivity() {
             button.setImageResource(R.drawable.us)
 
     }
+
+    private fun setPlayerName() {
+        val name = resources.getString(R.string.player_name)
+        val textField = findViewById<EditText>(R.id.editTextPlayerName)
+        textField.setText(name)
+    }
+
     private fun setupClickListeners() {
         findViewById<Button>(R.id.btnNewGame).setOnClickListener {
             startGame(GameMode.Classic)
@@ -65,9 +75,11 @@ class MainMenuActivity : AppCompatActivity() {
     }
 
     private fun startGame(mode: GameMode, continueGame: Boolean = false) {
+
         val intent = Intent(this, GameActivity::class.java).apply {
             putExtra("GAME_MODE", mode.name)
             putExtra("CONTINUE_GAME", continueGame)
+            putExtra("PLAYER_NAME", findViewById<EditText>(R.id.editTextPlayerName).text)
         }
         startActivity(intent)
     }

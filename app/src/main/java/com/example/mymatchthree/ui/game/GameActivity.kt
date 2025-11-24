@@ -7,13 +7,17 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.mymatchthree.R
 import com.example.mymatchthree.data.model.GameItem
 import com.example.mymatchthree.data.model.GameMode
+import com.example.mymatchthree.data.model.GameRecord
 import com.example.mymatchthree.data.model.GameState
 import com.example.mymatchthree.gameengine.GameEngine
+import com.example.mymatchthree.gameengine.GameRecordDAO
+import com.example.mymatchthree.gameengine.GameRecordsManager
 import com.example.mymatchthree.gameengine.GameSaveManager
 import kotlin.math.abs
 
 class GameActivity : AppCompatActivity() {
-
+    private lateinit var gameRecordDAO: GameRecordDAO
+    private lateinit var gameRecordsManager: GameRecordsManager
     private lateinit var gameEngine: GameEngine
     private var selectedItem: Pair<Int, Int>? = null
     private var selectedItemView: ItemView? = null
@@ -21,15 +25,20 @@ class GameActivity : AppCompatActivity() {
     private var gameSaveManager: GameSaveManager = GameSaveManager(this)
     private var gameMode: GameMode? = null
     private var loadSaved: Boolean = false
+    private lateinit var playerName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
+        gameRecordsManager = GameRecordsManager(this)
+        gameRecordDAO = GameRecordDAO(gameRecordsManager.getWritableDatabase())
+
         gameMode = intent.getStringExtra("GAME_MODE")?.let {
             GameMode.valueOf(it)
         } ?: GameMode.Classic
         loadSaved = intent.getBooleanExtra("CONTINUE_GAME", false)
+        playerName = intent.getStringExtra("PLAYER_NAME") ?: resources.getString(R.string.player_name)
 
         initializeGame()
         setupGridView()
@@ -61,6 +70,15 @@ class GameActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnBack).setOnClickListener {
             saveGameState()
             finish()
+        }
+        findViewById<Button>(R.id.btnRecord).setOnClickListener {
+            val gameState = gameEngine.getCurrentState()
+            gameRecordDAO.addRecord(
+                GameRecord(id = 52,
+                    scoreString = "",
+                    playerName = playerName,
+                    score = gameState.score,
+                    mode = gameState.gameMode))
         }
     }
 
@@ -181,6 +199,11 @@ class GameActivity : AppCompatActivity() {
     private fun saveGameState() {
         val prefs = getSharedPreferences("game_prefs", MODE_PRIVATE)
         prefs.edit().putBoolean("game_saved", true).apply()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        gameRecordsManager.close()
     }
 }
 

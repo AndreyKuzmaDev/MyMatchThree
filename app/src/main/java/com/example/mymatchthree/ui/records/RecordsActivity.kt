@@ -10,12 +10,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mymatchthree.R
 import com.example.mymatchthree.data.model.GameMode
 import com.example.mymatchthree.data.model.GameRecord
+import com.example.mymatchthree.gameengine.GameRecordDAO
+import com.example.mymatchthree.gameengine.GameRecordsManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class RecordsActivity : AppCompatActivity() {
-
+    private lateinit var gameRecordDAO: GameRecordDAO
+    private lateinit var gameRecordsManager: GameRecordsManager
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecordsAdapter
     private lateinit var tvEmpty: TextView
@@ -23,6 +26,9 @@ class RecordsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_records)
+
+        gameRecordsManager = GameRecordsManager(this)
+        gameRecordDAO = GameRecordDAO(gameRecordsManager.getWritableDatabase())
 
         initializeViews()
         setupRecyclerView()
@@ -57,45 +63,12 @@ class RecordsActivity : AppCompatActivity() {
     }
 
     private fun loadRecords() {
-        val demoRecords = listOf(
-            GameRecord(
-                playerName = "Andrey",
-                score = 2025,
-                mode = GameMode.Classic,
-                dateAchieved = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000),
-                score_str = resources.getString(R.string.word_score)
-            ),
-            GameRecord(
-                playerName = "Also Andrey",
-                score = 2020,
-                mode = GameMode.Infinite,
-                dateAchieved = System.currentTimeMillis() - (2 * 24 * 60 * 60 * 1000),
-                score_str = resources.getString(R.string.word_score)
-            ),
-            GameRecord(
-                playerName = "Andrey again",
-                score = 420,
-                mode = GameMode.Classic,
-                dateAchieved = System.currentTimeMillis() - (3 * 24 * 60 * 60 * 1000),
-                score_str = resources.getString(R.string.word_score)
-            ),
-            GameRecord(
-                playerName = "Nobody plays it",
-                score = 220,
-                mode = GameMode.Infinite,
-                dateAchieved = System.currentTimeMillis() - (4 * 24 * 60 * 60 * 1000),
-                score_str = resources.getString(R.string.word_score)
-            ),
-            GameRecord(
-                playerName = "EvilArthas",
-                score = 141,
-                mode = GameMode.Classic,
-                dateAchieved = System.currentTimeMillis() - (5 * 24 * 60 * 60 * 1000),
-                score_str = resources.getString(R.string.word_score)
-            )
-        )
+        val records = gameRecordDAO.getRecords()
+        for (i in 0..records.size-1) {
+            records[i].scoreString = resources.getString(R.string.word_score)
+        }
 
-        val sortedRecords = demoRecords.sortedByDescending { it.score }
+        val sortedRecords = records.sortedByDescending { it.score }
         adapter.submitList(sortedRecords)
 
         if (sortedRecords.isEmpty()) {
@@ -111,6 +84,12 @@ class RecordsActivity : AppCompatActivity() {
         adapter.submitList(emptyList())
         tvEmpty.visibility = TextView.VISIBLE
         recyclerView.visibility = RecyclerView.GONE
+        gameRecordDAO.clearRecords()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        gameRecordsManager.close()
     }
 }
 
@@ -145,7 +124,7 @@ class RecordsAdapter : RecyclerView.Adapter<RecordsAdapter.RecordViewHolder>() {
         fun bind(record: GameRecord, position: Int) {
             tvPosition.text = "$position"
             tvPlayerName.text = record.playerName
-            tvScore.text = "${record.score_str}: ${record.score}"
+            tvScore.text = "${record.scoreString}: ${record.score}"
             tvMode.text = when (record.mode) {
                 GameMode.Classic -> "Classic"
                 GameMode.Infinite -> "Infinite"
@@ -175,4 +154,5 @@ class RecordsAdapter : RecyclerView.Adapter<RecordsAdapter.RecordViewHolder>() {
             }
         }
     }
+
 }
