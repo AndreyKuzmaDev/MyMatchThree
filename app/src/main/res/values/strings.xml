@@ -14,4 +14,5 @@
     <string name="text_no_saves">No saves!</string>
     <string name="text_record">RECORD</string>
     <string name="player_name" translatable="false">PLAYER</string>
+    <string name="text_in_dev">This game mode is not available now :(</string>
 </resources>

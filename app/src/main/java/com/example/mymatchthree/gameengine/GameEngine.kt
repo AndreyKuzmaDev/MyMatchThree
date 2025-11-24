@@ -3,11 +3,12 @@ package com.example.mymatchthree.gameengine
 
 import androidx.lifecycle.MutableLiveData
 import com.example.mymatchthree.data.model.GameItem
+import com.example.mymatchthree.data.model.GameMode
 import com.example.mymatchthree.data.model.GameState
 import com.example.mymatchthree.data.model.ItemBonus
 
 
-class GameEngine(private val savedState: GameState? = null ,private val gridSize: Int = 8) {
+class GameEngine(private val savedState: GameState? = null, private val gridSize: Int = 8, private val gameMode: GameMode = GameMode.Classic) {
     val gameState = MutableLiveData<GameState>()
     var newId = 0
 
@@ -27,7 +28,7 @@ class GameEngine(private val savedState: GameState? = null ,private val gridSize
             }
             newGrid.add(row)
         }
-        return GameState(grid = newGrid)
+        return GameState(grid = newGrid, gameMode = gameMode)
     }
 
     fun getCurrentState(): GameState {

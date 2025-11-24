@@ -45,7 +45,7 @@ class MainMenuActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         findViewById<Button>(R.id.btnNewGame).setOnClickListener {
-            startGame(GameMode.Classic)
+            Toast.makeText(this, resources.getString(R.string.text_in_dev), Toast.LENGTH_SHORT).show()
         }
 
         findViewById<Button>(R.id.btnContinue).setOnClickListener {
@@ -79,7 +79,7 @@ class MainMenuActivity : AppCompatActivity() {
         val intent = Intent(this, GameActivity::class.java).apply {
             putExtra("GAME_MODE", mode.name)
             putExtra("CONTINUE_GAME", continueGame)
-            putExtra("PLAYER_NAME", findViewById<EditText>(R.id.editTextPlayerName).text)
+            putExtra("PLAYER_NAME", findViewById<EditText>(R.id.editTextPlayerName).text.toString())
         }
         startActivity(intent)
     }

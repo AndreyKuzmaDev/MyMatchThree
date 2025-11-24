@@ -23,7 +23,6 @@ class GameActivity : AppCompatActivity() {
     private var selectedItemView: ItemView? = null
 
     private var gameSaveManager: GameSaveManager = GameSaveManager(this)
-    private var gameMode: GameMode? = null
     private var loadSaved: Boolean = false
     private lateinit var playerName: String
 
@@ -34,9 +33,7 @@ class GameActivity : AppCompatActivity() {
         gameRecordsManager = GameRecordsManager(this)
         gameRecordDAO = GameRecordDAO(gameRecordsManager.getWritableDatabase())
 
-        gameMode = intent.getStringExtra("GAME_MODE")?.let {
-            GameMode.valueOf(it)
-        } ?: GameMode.Classic
+
         loadSaved = intent.getBooleanExtra("CONTINUE_GAME", false)
         playerName = intent.getStringExtra("PLAYER_NAME") ?: resources.getString(R.string.player_name)
 
@@ -52,8 +49,11 @@ class GameActivity : AppCompatActivity() {
             ))
         }
         else {
+            val gameMode = intent.getStringExtra("GAME_MODE")?.let {
+                GameMode.valueOf(it)
+            } ?: GameMode.Classic
             gameSaveManager.deleteSave()
-            gameEngine = GameEngine()
+            gameEngine = GameEngine(gameMode = gameMode)
         }
 
 
@@ -151,7 +151,7 @@ class GameActivity : AppCompatActivity() {
             if (areNeighbors(firstItem.first, firstItem.second, item.x, item.y)) {
                 val firstView = findViewByPosition(firstItem.first, firstItem.second)
                 gameEngine.swapItems(firstItem.first, firstItem.second, item.x, item.y)
-                gameSaveManager.saveGame(gameEngine.getCurrentState(), gameMode)
+                gameSaveManager.saveGame(gameEngine.getCurrentState())
 
             }
             clearSelection()

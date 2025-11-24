@@ -16,7 +16,7 @@ class GameSaveManager(private val context: Context) {
     private val saveFileName = "current_game_save.json"
     private val backupFileName = "backup_save.json"
 
-    fun saveGame(gameState: GameState, gameMode: GameMode?): Boolean {
+    fun saveGame(gameState: GameState): Boolean {
         return try {
             val gameSave = GameSave(
                 gameState = convertToSaveFormat(gameState),
