@@ -36,13 +36,23 @@ android {
         jvmTarget = "11"
     }
 }
-
+configurations {
+    create("cleanedAnnotations")
+    implementation {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
+}
 dependencies {
+    implementation("com.google.code.gson:gson:2.13.2")
+    implementation("androidx.sqlite:sqlite:2.6.2")
+    implementation("androidx.sqlite:sqlite-ktx:2.6.2")
+    implementation("androidx.room:room-runtime:2.8.4")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

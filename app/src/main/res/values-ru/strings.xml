@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="word_score">Очки</string>
+    <string name="word_moves">Ходы</string>
+    <string name="text_back">НАЗАД</string>
+    <string name="text_new_game">НОВАЯ ИГРА</string>
+    <string name="text_continue">ПРОДОЛЖИТЬ</string>
+    <string name="text_endless_mode">БЕСКОНЕЧНЫЙ РЕЖИМ</string>
+    <string name="text_records">РЕКОРДЫ</string>
+    <string name="text_clear">ОЧИСТИТЬ</string>
+    <string name="title_records">Таблица рекордов</string>
+    <string name="text_no_saves">Нет сохранений!</string>
+    <string name="text_record">РЕКОРД</string>
+    <string name="text_in_dev">Этот режим пока что не доступен :(</string>
+</resources>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="@color/background_primary">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_title"
+        android:textColor="@color/text_primary"
+        android:textSize="42sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="48dp"
+        android:fontFamily="sans-serif-condensed" />
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+		<Button
+			android:id="@+id/btnNewGame"
+			style="@style/MatchThreeButton"
+			android:layout_width="280dp"
+            android:layout_height="60dp"
+			android:text="@string/text_new_game" />
+
+		<Button
+			android:id="@+id/btnContinue"
+			style="@style/MatchThreeButton"
+			android:layout_width="280dp"
+            android:layout_height="60dp"
+			android:text="@string/text_continue" />
+
+		<Button
+			android:id="@+id/btnInfiniteMode"
+			style="@style/MatchThreeButton"
+			android:layout_width="280dp"
+            android:layout_height="60dp"
+			android:text="@string/text_endless_mode" />
+
+		<Button
+			android:id="@+id/btnRecords"
+			style="@style/MatchThreeButton"
+			android:layout_width="280dp"
+            android:layout_height="60dp"
+			android:text="@string/text_records" />
+
+		<ImageButton
+			android:id="@+id/btnLanguage"
+			android:layout_width="60dp"
+			android:layout_height="45dp"
+			android:layout_marginTop="0dp"
+			app:srcCompat="@drawable/us" />
+	</LinearLayout>
+
+	<EditText
+		android:id="@+id/editTextPlayerName"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:ems="10"
+		android:inputType="text"
+		android:text="Name" />
+
+
+</LinearLayout>
