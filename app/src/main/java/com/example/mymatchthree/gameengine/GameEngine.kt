@@ -5,12 +5,33 @@ import androidx.lifecycle.MutableLiveData
 import com.example.mymatchthree.data.model.GameItem
 import com.example.mymatchthree.data.model.GameMode
 import com.example.mymatchthree.data.model.GameState
+import com.example.mymatchthree.data.model.ItemAnimationState
 import com.example.mymatchthree.data.model.ItemBonus
 
 
 class GameEngine(private val savedState: GameState? = null, private val gridSize: Int = 8, private val gameMode: GameMode = GameMode.Classic) {
     val gameState = MutableLiveData<GameState>()
+    val animationEvents = MutableLiveData<AnimationEvent>()
     var newId = 0
+
+    sealed class AnimationEvent {
+        data class SwapItems(
+            val item1: GameItem,
+            val item2: GameItem,
+            val onComplete: () -> Unit
+        ) : AnimationEvent()
+
+        data class RemoveItems(
+            val items: Set<GameItem>,
+            val onComplete: () -> Unit
+        ) : AnimationEvent()
+
+        data class RefillItems(
+            val oldItems: List<GameItem>,
+            val newItems: List<GameItem>,
+            val onComplete: () -> Unit
+        ) : AnimationEvent()
+    }
 
     init {
         gameState.value = initializeGrid()
@@ -55,8 +76,8 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
         val item1 = grid[x1][y1]
         val item2 = grid[x2][y2]
 
-        grid[x1][y1] = item2.copy(x = x1, y = y1)
-        grid[x2][y2] = item1.copy(x = x2, y = y2)
+        grid[x1][y1] = item1.copy(animationState = ItemAnimationState.SWAPPING)
+        grid[x2][y2] = item2.copy(animationState = ItemAnimationState.SWAPPING)
 
         gameState.value = currentState.copy(
             grid = grid,
@@ -64,11 +85,27 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
             moves = currentState.moves + 1
         )
 
-        val matches = checkForMatches(grid)
-        if (matches.isEmpty()) {
-            swapBack(x1, y1, x2, y2)
-        } else {
-            processMatches(matches)
+        animationEvents.value = AnimationEvent.SwapItems(item1, item2) {
+            val updatedGrid = grid.map { it.toMutableList() }.toMutableList()
+            updatedGrid[x1][y1] = item2.copy(
+                x = x1,
+                y = y1,
+                animationState = ItemAnimationState.IDLE
+            )
+            updatedGrid[x2][y2] = item1.copy(
+                x = x2,
+                y = y2,
+                animationState = ItemAnimationState.IDLE
+            )
+
+            gameState.value = currentState.copy(grid = updatedGrid)
+
+            val matches = checkForMatches(updatedGrid)
+            if (matches.isEmpty()) {
+                swapBack(x1, y1, x2, y2)
+            } else {
+                processMatches(matches)
+            }
         }
     }
 
@@ -164,23 +201,34 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
     private fun processMatches(matches: Set<GameItem>) {
         val currentState = gameState.value ?: return
 
-        val baseScore = matches.size * 10
-        val bonus = if (matches.size > 3) (matches.size - 3) * 20 else 0
-        val totalScore = currentState.score + baseScore + bonus
+        animationEvents.value = AnimationEvent.RemoveItems(matches) {
+            val baseScore = matches.size * 10
+            val bonus = if (matches.size > 3) (matches.size - 3) * 20 else 0
+            val totalScore = currentState.score + baseScore + bonus
 
-        val refill = prepareRefill(matches)
+            val refill = prepareRefill(matches)
 
-        val newGrid = currentState.grid.map { row ->
-            row.map { item ->
-                if (item in matches) refill.find {it.x == item.x && it.y == item.y} else item
+            val oldItemsList = matches.toList()
+            animationEvents.value = AnimationEvent.RefillItems(oldItemsList, refill) {
+                val newGrid = currentState.grid.map { row ->
+                    row.map { item ->
+                        if (item in matches) {
+                            val newItem = refill.find { it.x == item.x && it.y == item.y }
+                            newItem?.copy(animationState = ItemAnimationState.IDLE) ?: item
+                        } else {
+                            item.copy(animationState = ItemAnimationState.IDLE)
+                        }
+                    }
+                }
+
+                gameState.value = currentState.copy(
+                    grid = newGrid as List<List<GameItem>>,
+                    score = totalScore,
+                    moves = currentState.moves,
+                    isSwapping = false
+                )
             }
         }
-        gameState.value = currentState.copy(
-            grid = newGrid as List<List<GameItem>>,
-            score = totalScore,
-            isSwapping = false
-        )
-
     }
 
     private fun swapBack(x1: Int, y1: Int, x2: Int, y2: Int) {
@@ -190,12 +238,23 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
         val item1 = grid[x1][y1]
         val item2 = grid[x2][y2]
 
-        grid[x1][y1] = item2.copy(x = x1, y = y1)
-        grid[x2][y2] = item1.copy(x = x2, y = y2)
+        animationEvents.value = AnimationEvent.SwapItems(item1, item2) {
+            val updatedGrid = grid.map { it.toMutableList() }.toMutableList()
+            updatedGrid[x1][y1] = item1.copy(
+                x = x1,
+                y = y1,
+                animationState = ItemAnimationState.IDLE
+            )
+            updatedGrid[x2][y2] = item2.copy(
+                x = x2,
+                y = y2,
+                animationState = ItemAnimationState.IDLE
+            )
 
-        gameState.value = currentState.copy(
-            grid = grid,
-            isSwapping = false
-        )
+            gameState.value = currentState.copy(
+                grid = updatedGrid,
+                isSwapping = false
+            )
+        }
     }
 }
