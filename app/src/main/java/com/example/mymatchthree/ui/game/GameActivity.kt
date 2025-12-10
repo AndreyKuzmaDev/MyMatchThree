@@ -118,13 +118,11 @@ class GameActivity : AppCompatActivity() {
                 }
 
                 is GameEngine.AnimationEvent.RefillItems -> {
-                    // Сначала скрываем старые элементы
                     event.oldItems.forEach { oldItem ->
                         val view = findViewByPosition(oldItem.x, oldItem.y) as? ItemView
                         view?.visibility = View.INVISIBLE
                     }
 
-                    // Затем анимируем появление новых
                     var completedAnimations = 0
                     val totalAnimations = event.newItems.size
 

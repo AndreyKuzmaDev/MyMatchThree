@@ -227,6 +227,9 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
                     moves = currentState.moves,
                     isSwapping = false
                 )
+                val newMatches = checkForMatches(newGrid)
+                if (!newMatches.isEmpty())
+                    processMatches(newMatches)
             }
         }
     }
