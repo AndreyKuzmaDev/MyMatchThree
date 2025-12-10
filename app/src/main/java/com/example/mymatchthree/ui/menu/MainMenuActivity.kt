@@ -45,7 +45,7 @@ class MainMenuActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         findViewById<Button>(R.id.btnNewGame).setOnClickListener {
-            Toast.makeText(this, resources.getString(R.string.text_in_dev), Toast.LENGTH_SHORT).show()
+            startGame(GameMode.Classic)
         }
 
         findViewById<Button>(R.id.btnContinue).setOnClickListener {
