@@ -14,13 +14,25 @@
         android:padding="16dp">
 
         <Button
+            android:id="@+id/btnClearRecords"
+            style="@style/MatchThreeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="false"
+            android:layout_margin="0dp"
+            android:text="@string/text_clear" />
+
+        <Button
             android:id="@+id/btnBack"
             style="@style/MatchThreeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/purple_700"
-            android:text="@string/text_back"
-            android:textColor="@color/white" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="0dp"
+            android:text="@string/text_back" />
 
         <TextView
             style="@style/MatchThreeTextView"
@@ -28,19 +40,9 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:text="@string/title_records"
-            android:textColor="@color/white"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btnClearRecords"
-            style="@style/MatchThreeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:backgroundTint="@color/purple_700"
-            android:text="@string/text_clear"
-            android:textColor="@color/white" />
 
     </RelativeLayout>
 
@@ -50,7 +52,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:padding="32dp"
-        android:text="Рекордов пока нет\n\nСыграйте в игру, чтобы установить первый рекорд!"
+        android:text="@string/text_no_records"
         android:textSize="18sp"
         android:visibility="gone" />
 

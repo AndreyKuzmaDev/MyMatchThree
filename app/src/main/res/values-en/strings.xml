@@ -13,4 +13,5 @@
     <string name="text_record">RECORD</string>
     <string name="text_in_dev">This game mode is not available now :(</string>
     <string name="text_no_moves">No moves!</string>
+    <string name="text_no_records">There are no records yet</string>
 </resources>

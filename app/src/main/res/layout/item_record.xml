@@ -58,7 +58,7 @@
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="2dp"
                 android:text="Classic"
-                android:textColor="@color/black"
+                android:textColor="@color/button_text"
                 android:textSize="14sp" />
 
         </LinearLayout>
