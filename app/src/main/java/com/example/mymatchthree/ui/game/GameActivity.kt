@@ -44,6 +44,7 @@ class GameActivity : AppCompatActivity() {
         setupGridView()
         setupClickListeners()
         setupAnimationObserver()
+        setupNoMovesObserver()
     }
 
     private fun initializeGame() {
@@ -139,6 +140,29 @@ class GameActivity : AppCompatActivity() {
                         }
                     }
                 }
+
+                is GameEngine.AnimationEvent.Shuffle -> {
+                    startShuffleAnimation(event.items) {
+                        event.onComplete()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupNoMovesObserver() {
+        val tvNoMoves = findViewById<TextView>(R.id.tvNoMoves)
+        gameEngine.noMovesAvailable.observe(this) { noMoves ->
+            if (noMoves) {
+                tvNoMoves.visibility = View.VISIBLE
+
+                tvNoMoves.alpha = 0f
+                tvNoMoves.animate()
+                    .alpha(1f)
+                    .setDuration(500)
+                    .start()
+            } else {
+                tvNoMoves.visibility = View.GONE
             }
         }
     }
@@ -257,6 +281,34 @@ class GameActivity : AppCompatActivity() {
                 .scaleY(1.1f)
                 .setDuration(200)
                 .start()
+        }
+    }
+
+    private fun startShuffleAnimation(items: List<GameItem>, onComplete: () -> Unit) {
+        val totalItems = items.size
+        var completedAnimations = 0
+
+        items.forEach { item ->
+            val view = findViewByPosition(item.x, item.y) as? ItemView
+            view?.animate()
+                ?.rotationBy(360f)
+                ?.scaleX(0.5f)
+                ?.scaleY(0.5f)
+                ?.setDuration(400)
+                ?.withEndAction {
+                    view.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(200)
+                        .withEndAction {
+                            completedAnimations++
+                            if (completedAnimations == totalItems) {
+                                onComplete()
+                            }
+                        }
+                        .start()
+                }
+                ?.start()
         }
     }
 

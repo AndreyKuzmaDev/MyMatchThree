@@ -56,6 +56,17 @@
                     android:text="@string/word_score" />
 
                 <TextView
+                    android:id="@+id/tvNoMoves"
+                    style="@style/Widget.AppCompat.TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginEnd="24dp"
+                    android:layout_weight="1"
+                    android:text="@string/text_no_moves"
+                    android:textColor="@color/color_primary" />
+
+                <TextView
                     android:id="@+id/tvMoves"
                     style="@style/MatchThreeTextView"
                     android:layout_width="wrap_content"

@@ -12,6 +12,7 @@ import com.example.mymatchthree.data.model.ItemBonus
 class GameEngine(private val savedState: GameState? = null, private val gridSize: Int = 8, private val gameMode: GameMode = GameMode.Classic) {
     val gameState = MutableLiveData<GameState>()
     val animationEvents = MutableLiveData<AnimationEvent>()
+    val noMovesAvailable = MutableLiveData<Boolean>(false)
     var newId = 0
 
     sealed class AnimationEvent {
@@ -31,10 +32,21 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
             val newItems: List<GameItem>,
             val onComplete: () -> Unit
         ) : AnimationEvent()
+
+        data class Shuffle(
+            val items: List<GameItem>,
+            val onComplete: () -> Unit
+        ) : AnimationEvent()
     }
 
     init {
         gameState.value = initializeGrid()
+        val grid = gameState.value?.grid
+        if (grid != null) {
+            val newMatches = checkForMatches(grid)
+            if (!newMatches.isEmpty())
+                processMatches(newMatches)
+        }
     }
 
     fun initializeGrid(): GameState {
@@ -82,7 +94,6 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
         gameState.value = currentState.copy(
             grid = grid,
             isSwapping = true,
-            moves = currentState.moves + 1
         )
 
         animationEvents.value = AnimationEvent.SwapItems(item1, item2) {
@@ -224,12 +235,17 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
                 gameState.value = currentState.copy(
                     grid = newGrid as List<List<GameItem>>,
                     score = totalScore,
-                    moves = currentState.moves,
+                    moves = currentState.moves + 1,
                     isSwapping = false
                 )
+                val movesAvailable = checkAvailableMoves()
                 val newMatches = checkForMatches(newGrid)
                 if (!newMatches.isEmpty())
                     processMatches(newMatches)
+                else if (!movesAvailable) {
+                    if (gameMode == GameMode.Infinite)
+                        reshuffleGrid()
+                }
             }
         }
     }
@@ -256,8 +272,133 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
 
             gameState.value = currentState.copy(
                 grid = updatedGrid,
-                isSwapping = false
+                isSwapping = false,
             )
+        }
+    }
+
+    fun checkAvailableMoves(): Boolean {
+        val currentState = gameState.value ?: return false
+        val grid = currentState.grid
+
+        for (i in grid.indices) {
+            for (j in grid[i].indices) {
+                if (j < grid[i].size - 1) {
+                    if (isValidSwap(grid, i, j, i, j + 1)) {
+                        noMovesAvailable.value = false
+                        return true
+                    }
+                }
+
+                if (i < grid.size - 1) {
+                    if (isValidSwap(grid, i, j, i + 1, j)) {
+                        noMovesAvailable.value = false
+                        return true
+                    }
+                }
+            }
+        }
+
+        noMovesAvailable.value = true
+        return false
+    }
+
+    private fun isValidSwap(grid: List<List<GameItem>>, x1: Int, y1: Int, x2: Int, y2: Int): Boolean {
+        val tempGrid = grid.map { it.toMutableList() }.toMutableList()
+
+        val item1 = tempGrid[x1][y1]
+        val item2 = tempGrid[x2][y2]
+
+        tempGrid[x1][y1] = item2.copy(x = x1, y = y1)
+        tempGrid[x2][y2] = item1.copy(x = x2, y = y2)
+
+        val horizontalMatches = findHorizontalMatches(tempGrid)
+        val verticalMatches = findVerticalMatches(tempGrid)
+
+        return horizontalMatches.isNotEmpty() || verticalMatches.isNotEmpty()
+    }
+
+    fun reshuffleGrid() {
+        val currentState = gameState.value ?: return
+        val newGrid = mutableListOf<List<GameItem>>()
+
+        val availableTypes = (1..6).toList()
+        val allItems = mutableListOf<Int>()
+
+        for (i in 0 until gridSize) {
+            for (j in 0 until gridSize) {
+                allItems.add(availableTypes.random())
+            }
+        }
+
+        allItems.shuffle()
+
+        var index = 0
+        for (i in 0 until gridSize) {
+            val row = mutableListOf<GameItem>()
+            for (j in 0 until gridSize) {
+                row.add(GameItem(
+                    id = newId++,
+                    type = allItems[index],
+                    x = i,
+                    y = j
+                ))
+                index++
+            }
+            newGrid.add(row)
+        }
+        createGuaranteedMove(newGrid as MutableList<MutableList<GameItem>>)
+
+        gameState.value = currentState.copy(grid = newGrid)
+        noMovesAvailable.value = false
+
+        triggerShuffleAnimation()
+    }
+
+    private fun checkAvailableMovesForGrid(grid: List<List<GameItem>>): Boolean {
+        for (i in grid.indices) {
+            for (j in grid[i].indices) {
+                if (j < grid[i].size - 1) {
+                    if (isValidSwap(grid, i, j, i, j + 1)) {
+                        return true
+                    }
+                }
+
+                if (i < grid.size - 1) {
+                    if (isValidSwap(grid, i, j, i + 1, j)) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    private fun createGuaranteedMove(grid: MutableList<MutableList<GameItem>>) {
+        val type = (1..6).random()
+
+        val x = (0 until gridSize - 2).random()
+        val y = (0 until gridSize).random()
+
+        grid[x][y] = grid[x][y].copy(type = type)
+        grid[x + 1][y] = grid[x + 1][y].copy(type = type)
+        grid[x + 2][y] = grid[x + 2][y].copy(type = type)
+
+        if (y < gridSize - 1) {
+            val swapType = (1..6).filter { it != type }.random()
+            grid[x][y + 1] = grid[x][y + 1].copy(type = swapType)
+        } else if (y > 0) {
+            val swapType = (1..6).filter { it != type }.random()
+            grid[x][y - 1] = grid[x][y - 1].copy(type = swapType)
+        }
+    }
+
+    private fun triggerShuffleAnimation() {
+        val currentState = gameState.value ?: return
+        val items = currentState.grid.flatten()
+
+        animationEvents.value = AnimationEvent.Shuffle(items) {
+            checkAvailableMoves()
         }
     }
 }

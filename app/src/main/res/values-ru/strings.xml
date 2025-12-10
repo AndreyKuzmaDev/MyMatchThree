@@ -12,4 +12,5 @@
     <string name="text_no_saves">Нет сохранений!</string>
     <string name="text_record">РЕКОРД</string>
     <string name="text_in_dev">Этот режим пока что не доступен :(</string>
+    <string name="text_no_moves">Нет ходов!</string>
 </resources>
