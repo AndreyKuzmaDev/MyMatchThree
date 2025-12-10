@@ -259,12 +259,12 @@ class GameEngine(private val savedState: GameState? = null, private val gridSize
 
         animationEvents.value = AnimationEvent.SwapItems(item1, item2) {
             val updatedGrid = grid.map { it.toMutableList() }.toMutableList()
-            updatedGrid[x1][y1] = item1.copy(
+            updatedGrid[x1][y1] = item2.copy(
                 x = x1,
                 y = y1,
                 animationState = ItemAnimationState.IDLE
             )
-            updatedGrid[x2][y2] = item2.copy(
+            updatedGrid[x2][y2] = item1.copy(
                 x = x2,
                 y = y2,
                 animationState = ItemAnimationState.IDLE
